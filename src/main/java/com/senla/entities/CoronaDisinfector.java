@@ -1,13 +1,15 @@
 package com.senla.entities;
 
+import com.senla.ObjectFactory;
+
 public class CoronaDisinfector {
 
+                                  // объект ObjectFactory создай объект из Announcer.class
+    private Announcer announcer = ObjectFactory.getInstance().createObject(Announcer.class);
+    private Policeman policeman = ObjectFactory.getInstance().createObject(Policeman.class);
 
-     private Announcer announcer = new AnnouncerImpl();
-    private Policeman policeman = new PolicemanImpl();
 
-
-    public void start(Room room){
+    public void start(Room room) {
 
         announcer.announce("Начинаем дезинфекцию!");
         policeman.makePeopleLeaveRoom();
@@ -16,7 +18,7 @@ public class CoronaDisinfector {
 
     }
 
-    private void disinfect(Room room){
+    private void disinfect(Room room) {
         System.out.println(CoronaDisinfector.class.getName() + ": Изгоняю корону! Изыди! - Вирус Уничтожен!");
     }
 }
