@@ -4,7 +4,7 @@ import com.senla.ObjectFactory;
 
 public class CoronaDisinfector {
 
-                                  // объект ObjectFactory создай объект из Announcer.class
+                                  //создаем синглтон фабрику через конструктор объект ObjectFactory создай объект из Announcer.class
     private Announcer announcer = ObjectFactory.getInstance().createObject(Announcer.class);
     private Policeman policeman = ObjectFactory.getInstance().createObject(Policeman.class);
 
@@ -19,6 +19,6 @@ public class CoronaDisinfector {
     }
 
     private void disinfect(Room room) {
-        System.out.println(CoronaDisinfector.class.getName() + ": Изгоняю корону! Изыди! - Вирус Уничтожен!");
+        System.out.println(CoronaDisinfector.class.getSimpleName() + ": Изгоняю корону! Изыди! - Вирус Уничтожен!");
     }
 }
