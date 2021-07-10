@@ -1,11 +1,13 @@
 package com.senla.configurations;
 
+import lombok.Getter;
 import org.reflections.Reflections;
 
 import java.util.Map;
 import java.util.Set;
 
 public class JavaConfig implements Config {
+    @Getter // создаем геттер для сканера
     // расширяет возможности текущего Reflection в java
     private Reflections scanner;
     // содержит ключь-значение для интерфейсов у которых больше 1-й имплиментации
