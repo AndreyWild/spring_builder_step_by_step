@@ -1,5 +1,7 @@
 package com.senla.entities;
 
+import com.senla.annotations.Singleton;
+
 public class PolicemanAngryImpl implements Policeman {
     @Override
     public void makePeopleLeaveRoom() {

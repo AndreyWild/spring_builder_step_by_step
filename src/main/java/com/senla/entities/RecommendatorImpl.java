@@ -1,7 +1,9 @@
 package com.senla.entities;
 
 import com.senla.annotations.InjectProperty;
+import com.senla.annotations.Singleton;
 
+@Singleton
 public class RecommendatorImpl implements Recommendator {
 
     @InjectProperty("kvas") // если оставить пустым то будет искать в файле "alcohol"

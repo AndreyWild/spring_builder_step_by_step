@@ -1,12 +1,15 @@
 package com.senla.entities;
 
 import com.senla.ObjectFactory;
+import com.senla.annotations.Autowired;
 
 public class CoronaDisinfector {
 
                                   //создаем синглтон фабрику через конструктор объект ObjectFactory создай объект из Announcer.class
-    private Announcer announcer = ObjectFactory.getInstance().createObject(Announcer.class);
-    private Policeman policeman = ObjectFactory.getInstance().createObject(Policeman.class);
+    @Autowired
+    private Announcer announcer;
+    @Autowired
+    private Policeman policeman;
 
 
     public void start(Room room) {

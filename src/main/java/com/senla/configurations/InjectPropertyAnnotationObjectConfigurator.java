@@ -34,7 +34,7 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
 
     /** Метод проверяет все поля объекта в цикле на наличие аннотации и конфигурирует эти поля в зависимости от значения в аннотации */
     @Override
-    public void configure(Object t) {
+    public void configure(Object t, ApplicationContext context) {
         // получаем Class из объекта
         Class<?> implClass = t.getClass();
 

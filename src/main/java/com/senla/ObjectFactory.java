@@ -1,10 +1,12 @@
 package com.senla;
 
+import com.senla.configurations.ApplicationContext;
 import com.senla.configurations.Config;
 import com.senla.configurations.JavaConfig;
 import com.senla.configurations.ObjectConfigurator;
 import com.senla.entities.Policeman;
 import com.senla.entities.PolicemanAngryImpl;
+import lombok.Setter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -13,23 +15,21 @@ import java.util.List;
 import java.util.Map;
 
 public class ObjectFactory {
-    // инициализируем объект класса ObjectFactory
-    private static ObjectFactory ourInstance = new ObjectFactory();
+
     // список возможных реализаций интерфейса ObjectConfigurator
     private List<ObjectConfigurator> configurators = new ArrayList<>();
-    // объект класса Config
-    private Config config;
 
-    public static ObjectFactory getInstance() {
-        return ourInstance;
-    }
+    private final ApplicationContext context;
 
     // приватный конструктор
-    private ObjectFactory() {
+    public ObjectFactory(ApplicationContext context) {
+        this.context = context;
+
         // инициализируем config добавляя в него путь для сканера и map в нужным (интерфейс, его имплиментация)
-        config = new JavaConfig("com.senla", new HashMap<>(Map.of(Policeman.class, PolicemanAngryImpl.class)));
+        // config = new JavaConfig("com.senla", new HashMap<>(Map.of(Policeman.class, PolicemanAngryImpl.class)));
+
         // дай сканер, дай все реализации(ObjectConfigurator.class), проитерируемся по ним
-        for (Class<? extends ObjectConfigurator> aClass : config.getScanner().getSubTypesOf(ObjectConfigurator.class)) {
+        for (Class<? extends ObjectConfigurator> aClass : context.getConfig().getScanner().getSubTypesOf(ObjectConfigurator.class)) {
             // добавляем все его имплиментации в configurators;
             try {
                 configurators.add(aClass.getDeclaredConstructor().newInstance());
@@ -42,14 +42,8 @@ public class ObjectFactory {
 
 
     // метод создает объект класса полученного из type
-    public <T> T createObject(Class<T> type) {
-        // проверяем есть ли у type имплиментации
-        Class<? extends T> implClass = type;
-        // если type является интерфейсом
-        if (type.isInterface()) {
-            // тогда implClass = объекту который будети принимать type проверять является ли он интерфесом и возвращать его имплиментацию
-            implClass = config.getImpClass(type);
-        }
+    public <T> T createObject(Class<T> implClass) {
+
         /* если конструктор private
         Constructor<T> constructor = (Constructor<T>) implClass.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -69,7 +63,7 @@ public class ObjectFactory {
         T initialized = t;
 
         // насраиваем объект всеми конфигураторами из configurators
-        configurators.forEach(objectConfigurator -> objectConfigurator.configure(initialized));
+        configurators.forEach(objectConfigurator -> objectConfigurator.configure(initialized, context));
 
         return initialized;
     }
