@@ -1,18 +1,13 @@
 package com.senla;
 
 import com.senla.configurations.ApplicationContext;
-import com.senla.configurations.Config;
-import com.senla.configurations.JavaConfig;
 import com.senla.configurations.ObjectConfigurator;
-import com.senla.entities.Policeman;
-import com.senla.entities.PolicemanAngryImpl;
-import lombok.Setter;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ObjectFactory {
 
@@ -40,17 +35,45 @@ public class ObjectFactory {
         }
     }
 
-
     // метод создает объект класса полученного из type
     public <T> T createObject(Class<T> implClass) {
 
         /* если конструктор private
         Constructor<T> constructor = (Constructor<T>) implClass.getDeclaredConstructor();
         constructor.setAccessible(true);
-        return constructor.newInstance();
-        */
-
+        return constructor.newInstance(); */
         // конвенция: конструктор должен быть дефолтным
+        T t = create(implClass);
+
+        // насраиваем объект всеми конфигураторами из configurators
+        configure(t);
+
+        // запускаем у объекта метод с пометкой @PostConstruct
+        invokeInit(implClass, t);
+
+        return t;
+    }
+
+    private <T> void invokeInit(Class<T> implClass, T t) {
+        // Берем все методы класса, итерируемся по ним
+        for (Method method : implClass.getMethods()) {
+            // если метод содержит аннотацию @PostConstruct
+            if (method.isAnnotationPresent(PostConstruct.class)) {
+                // запускаем этот метод
+                try {
+                    method.invoke(t);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private <T> void configure(T initialized) {
+        configurators.forEach(objectConfigurator -> objectConfigurator.configure(initialized, context));
+    }
+
+    private <T> T create(Class<T> implClass) {
         T t = null;
         try {
             t = implClass.getDeclaredConstructor().newInstance();
@@ -58,13 +81,6 @@ public class ObjectFactory {
             System.err.println("Что-то пошло не так с созданием объекта из класса!");
             e.printStackTrace();
         }
-
-        // проиниицализированный объект
-        T initialized = t;
-
-        // насраиваем объект всеми конфигураторами из configurators
-        configurators.forEach(objectConfigurator -> objectConfigurator.configure(initialized, context));
-
-        return initialized;
+        return t;
     }
 }
